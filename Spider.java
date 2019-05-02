@@ -17,13 +17,13 @@ import org.jsoup.select.Elements;
 public class Spider
 {
 
-	private String seed = "http://arstechnica.com/";
+	private String seed = "http://arstechnica.com/";	// Test url, will be replaced by seeds from file
 	private Document htmlDocument;
 
 	private String seedFilePath;
 	private int maxHopDistance;
-	private boolean seedPopulated = false;
-	private final long DOMAIN_WAIT_TIME_MILLI = 2000;
+	private boolean seedPopulated = false;				// Will be used to prevent threads from initiating work before queuee is seeded
+	private final long DOMAIN_WAIT_TIME_MILLI = 2000;	// How long to wait before requests to same server
 
 	//LinkedBlockingQueue is to be used without the blocking capabilities
 	//ArrayList of queues that will track the hop depth from original seed urls
@@ -58,6 +58,8 @@ public class Spider
 		return this.visitedUrlHashMap;
 	}
 
+	// Return value currently not used
+	// Most of the work is handled here, requires object that handles Document storage
 	public boolean crawl(String url, int queueNumber)
 	{
 		try
@@ -117,11 +119,13 @@ public class Spider
 		this.visitedUrlHashMap.put(nextUrl, System.currentTimeMillis());
 
 		String hostUrl = getHost(nextUrl);
+		// Testing print statement
 		System.out.println("Host URL: " + hostUrl);
 
         if(this.visitedDomainHashMap.containsKey(hostUrl))
         {
         		long hostElapsedTime = System.currentTimeMillis() - this.visitedDomainHashMap.get(hostUrl);
+        		// Testing print statement	
         		System.out.println("Last millis since last visit of: " + hostUrl + ": " + hostElapsedTime);
 
             	if( hostElapsedTime < DOMAIN_WAIT_TIME_MILLI)
@@ -156,6 +160,7 @@ public class Spider
 		}
 	}
 
+	// Placeholder function, needs to be replaced by function that reeds seeds from file
 	public void testSeedInit()
 	{
 		try
@@ -168,6 +173,7 @@ public class Spider
 		}
 	}
 
+	// Testing function - depricated
 	public void printSeedQ()
 	{
 		try
@@ -203,6 +209,7 @@ public class Spider
 		return url;
 	}
 
+	//Will be used to verify .gov urls once we clear testing phase
 	public boolean confirmDotGov(String url)
 	{
 		if(url.indexOf(".gov") != -1)
@@ -215,6 +222,8 @@ public class Spider
 		}
 	}
 
+	// calls helper functions to normalize url and return normalized url if valid
+	// otherwise returns empty string ""
 	public String normalizeUrl(String url)
 	{
 		String temp = removeBookmark(url);
@@ -229,6 +238,7 @@ public class Spider
 		} 
 	}
 
+	// returns host url which is used to track requests to specific server
 	public String getHost(String url)
 	{
 		try

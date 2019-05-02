@@ -7,8 +7,11 @@ public class SpiderTest
     {
         Spider spider = new Spider("", 2);
 
+        // This function should be replaced by a function that reads seeds in from file
         spider.testSeedInit();
         
+        // unsure if I will have this functionality moved to Spider class
+        // can possible leave this functionality for thread. Requires testing
         int listSize = spider.listSize();
         for(int i = 0; i < listSize; i++)
         {
