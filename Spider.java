@@ -117,12 +117,12 @@ public class Spider
 		this.visitedUrlHashMap.put(nextUrl, System.currentTimeMillis());
 
 		String hostUrl = getHost(nextUrl);
-		System.out.println(hostUrl);
+		System.out.println("Host URL: " + hostUrl);
 
         if(this.visitedDomainHashMap.containsKey(hostUrl))
         {
         		long hostElapsedTime = System.currentTimeMillis() - this.visitedDomainHashMap.get(hostUrl);
-        		System.out.println("" + hostElapsedTime);
+        		System.out.println("Last millis since last visit of: " + hostUrl + ": " + hostElapsedTime);
 
             	if( hostElapsedTime < DOMAIN_WAIT_TIME_MILLI)
             	{
