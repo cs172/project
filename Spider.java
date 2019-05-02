@@ -29,7 +29,8 @@ public class Spider
 	private List<LinkedBlockingQueue<String>> queueArrayList;
 
 	//This hash map will keep track 
-	private ConcurrentHashMap<String, Integer> visitedHashMap = new ConcurrentHashMap<String, Integer>();
+	private ConcurrentHashMap<String, Integer> visitedUrlHashMap = new ConcurrentHashMap<String, Integer>();
+	private ConcurrentHashMap<String, Integer> visitedDomainHashMap =  new ConcurrentHashMap<String, Integer>();
 
 	public Spider(String seedFilePath, int maxHopDistance)
 	{
@@ -53,7 +54,7 @@ public class Spider
 
 	public ConcurrentHashMap<String, Integer> getConcurrentHashMap()
 	{
-		return this.visitedHashMap;
+		return this.visitedUrlHashMap;
 	}
 
 	public boolean crawl(String url, int queueNumber)
@@ -109,9 +110,9 @@ public class Spider
 				nextUrl = normalizeUrl(nextUrl);
 			}
 		}
-		while(this.visitedHashMap.containsKey(nextUrl));
+		while(this.visitedUrlHashMap.containsKey(nextUrl));
 
-		this.visitedHashMap.put(nextUrl, 0);
+		this.visitedUrlHashMap.put(nextUrl, 0);
 
 		return nextUrl;
 	}
