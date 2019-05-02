@@ -23,12 +23,12 @@ public class SpiderTest
         				if((i+1) < listSize )
         				{
         					spider.crawl(temp, i+1);
-        					Thread.sleep(1000);
+        					//Thread.sleep(1000);
         				}
         				else
         				{
         					spider.crawl(temp, -1);
-        					Thread.sleep(1000);
+        					//Thread.sleep(1000);
         				}
         			}
         		}

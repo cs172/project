@@ -2,6 +2,7 @@ package com.ucr.cs172.project.crawler;
 
 import java.io.IOException;
 import java.net.URI;
+
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
@@ -22,15 +23,15 @@ public class Spider
 	private String seedFilePath;
 	private int maxHopDistance;
 	private boolean seedPopulated = false;
-
+	private final long DOMAIN_WAIT_TIME_MILLI = 2000;
 
 	//LinkedBlockingQueue is to be used without the blocking capabilities
 	//ArrayList of queues that will track the hop depth from original seed urls
 	private List<LinkedBlockingQueue<String>> queueArrayList;
 
 	//This hash map will keep track 
-	private ConcurrentHashMap<String, Integer> visitedUrlHashMap = new ConcurrentHashMap<String, Integer>();
-	private ConcurrentHashMap<String, Integer> visitedDomainHashMap =  new ConcurrentHashMap<String, Integer>();
+	private ConcurrentHashMap<String, Long> visitedUrlHashMap = new ConcurrentHashMap<String, Long>();
+	private ConcurrentHashMap<String, Long> visitedDomainHashMap =  new ConcurrentHashMap<String, Long>();
 
 	public Spider(String seedFilePath, int maxHopDistance)
 	{
@@ -52,7 +53,7 @@ public class Spider
 		return this.queueArrayList;
 	}
 
-	public ConcurrentHashMap<String, Integer> getConcurrentHashMap()
+	public ConcurrentHashMap<String, Long> getConcurrentHashMap()
 	{
 		return this.visitedUrlHashMap;
 	}
@@ -64,6 +65,7 @@ public class Spider
             Connection connection = Jsoup.connect(url);
             Document htmlDocument = connection.get();
             this.htmlDocument = htmlDocument;
+
             if(connection.response().statusCode() == 200) // 200 is the HTTP OK status code
                                                           // indicating that everything is great.
             {
@@ -74,7 +76,7 @@ public class Spider
                 System.out.println("**Failure** Retrieved something other than HTML");
                 return false;
             }
-            Elements linksOnPage = htmlDocument.select("a[href]");
+            Elements linksOnPage = htmlDocument.select("a[abs:href]");
             System.out.println("Found (" + linksOnPage.size() + ") links adding to queue number: " + queueNumber);
             for(Element link : linksOnPage)
             {
@@ -112,7 +114,30 @@ public class Spider
 		}
 		while(this.visitedUrlHashMap.containsKey(nextUrl));
 
-		this.visitedUrlHashMap.put(nextUrl, 0);
+		this.visitedUrlHashMap.put(nextUrl, System.currentTimeMillis());
+
+		String hostUrl = getHost(nextUrl);
+		System.out.println(hostUrl);
+
+        if(this.visitedDomainHashMap.containsKey(hostUrl))
+        {
+        		long hostElapsedTime = System.currentTimeMillis() - this.visitedDomainHashMap.get(hostUrl);
+        		System.out.println("" + hostElapsedTime);
+
+            	if( hostElapsedTime < DOMAIN_WAIT_TIME_MILLI)
+            	{
+            		try
+            		{
+            			Thread.sleep(hostElapsedTime);
+            		}
+            		catch(Exception e) 
+            		{
+            			System.out.println("Interrupted");
+            		}
+            	}
+        }
+
+        this.visitedDomainHashMap.put(hostUrl, System.currentTimeMillis());
 
 		return nextUrl;
 	}
@@ -202,5 +227,20 @@ public class Spider
 		{
 			return removeTrailingSlash(temp); 
 		} 
+	}
+
+	public String getHost(String url)
+	{
+		try
+		{
+			URI temp = new URI(url);
+
+			return temp.getHost();
+		}
+		catch(Exception e)
+		{	
+			return "";
+		}
+
 	}
 }
