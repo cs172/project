@@ -177,6 +177,18 @@ public class Spider
 		return url;
 	}
 
+	public boolean confirmDotGov(String url)
+	{
+		if(url.indexOf(".gov") != -1)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	public String normalizeUrl(String url)
 	{
 		String temp = removeBookmark(url);
