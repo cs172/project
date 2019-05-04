@@ -17,7 +17,7 @@ import org.jsoup.select.Elements;
 public class Spider
 {
 
-	private String seed = "http://arstechnica.com/";	// Test url, will be replaced by seeds from file
+	private String seed = "https://www.usa.gov";	// Test url, will be replaced by seeds from file
 	private Document htmlDocument;
 
 	private String seedFilePath;
@@ -44,7 +44,7 @@ public class Spider
 		{
 			queueArrayList.add(new LinkedBlockingQueue<String>());
 		}
-		
+
 	}
 
 	public List<LinkedBlockingQueue<String>> getQueueArrayList()
@@ -93,7 +93,7 @@ public class Spider
         	System.out.println("crawl exception");
             // We were not successful in our HTTP request
             return false;
-        }
+        } 	
 	}
 
 	public String nextUrl(int queueNumber)
@@ -106,7 +106,7 @@ public class Spider
 
 			nextUrl = normalizeUrl(nextUrl);
 
-			while(nextUrl == "")
+			while(nextUrl == "" || !confirmDotGov(nextUrl))
 			{
 				nextUrl = this.queueArrayList.get(queueNumber).poll();
 

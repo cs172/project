@@ -13,28 +13,29 @@ class MultithreadTest extends Thread
     public void run()
     { 
         try{
-        int listSize = spider.listSize();
-        for(int i = 0; i < listSize; i++)
-        {
-            while( spider.getQueueArrayList().get(i).size() > 0)
+            int listSize = spider.listSize();
+            for(int i = 0; i < listSize; i++)
             {
-                String temp = spider.nextUrl(i);
-
-                if(temp.length() > 0)
+                while( spider.getQueueArrayList().get(i).size() > 0)
                 {
-                    if((i+1) < listSize )
+                    String temp = spider.nextUrl(i);
+
+                    if(temp.length() > 0)
                     {
-                    spider.crawl(temp, i+1);
-                    //Thread.sleep(1000);
-                    }
-                    else
-                    {
-                        spider.crawl(temp, -1);
-                        //Thread.sleep(1000);
+                        if((i+1) < listSize )
+                        {
+                            spider.crawl(temp, i+1);
+                            //Thread.sleep(1000);
+                        }
+                        else
+                        {
+                            spider.crawl(temp, -1);
+                            //Thread.sleep(1000);
+                        }
                     }
                 }
             }
-        }}
+        }
         catch(Exception e)
         {
             System.out.println("MultithreadTest Fail");
