@@ -3,6 +3,12 @@ package com.ucr.cs172.project.crawler;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.File;
+
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.net.URI;
 
@@ -17,7 +23,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.select.Elements;
-//import org.apache.commons.io.FileUtils;
+
+import org.apache.commons.io.FileUtils;
+
+
 import java.net.URL; 
 import java.net.MalformedURLException; 
 
