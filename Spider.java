@@ -1,7 +1,9 @@
 package com.ucr.cs172.project.crawler;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+
 import java.net.URI;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -9,22 +11,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Attribute;
 import org.jsoup.select.Elements;
+//import org.apache.commons.io.FileUtils;
+import java.net.URL; 
+import java.net.MalformedURLException; 
 
 public class Spider
 {
 
-	private String seed = "http://arstechnica.com/";
+	private String seed = "http://arstechnica.com/";	// Test url, will be replaced by seeds from file
 	private Document htmlDocument;
 
 	private String seedFilePath;
 	private int maxHopDistance;
-	private boolean seedPopulated = false;
-	private final long DOMAIN_WAIT_TIME_MILLI = 2000;
+	private boolean seedPopulated = false;				// Will be used to prevent threads from initiating work before queuee is seeded
+	private final long DOMAIN_WAIT_TIME_MILLI = 2000;	// How long to wait before requests to same server
 
 	//LinkedBlockingQueue is to be used without the blocking capabilities
 	//ArrayList of queues that will track the hop depth from original seed urls
@@ -59,6 +65,8 @@ public class Spider
 		return this.visitedUrlHashMap;
 	}
 
+	// Return value currently not used
+	// Most of the work is handled here, requires object that handles Document storage
 	public boolean crawl(String url, int queueNumber)
 	{
 		try
@@ -96,6 +104,54 @@ public class Spider
         }
 	}
 
+	
+	
+	
+	
+//	public void downloadWebsite(Document doc)
+//	{
+//		try {
+//			//URL url = new URL(Website);
+//			BufferedReader readr = new BufferedReader(new InputStreamReader(url.openStream()));
+//			// create file with title as the name
+//			String title = doc.title() + ".html";
+//			
+//			BufferedWriter writer = new BufferedWriter(new FileWriter(url));
+//			
+//			String line;
+//			// Read each line until end of line
+//			while((line = readr.readLine()) != null) {
+//				writer.write(line);
+//			}
+//			readr.close(); // close the site
+//			writer.close(); // close the file
+//		}
+//		catch (MalformedURLException mue) {
+//			System.out.println("Malformed URL Exception raised");
+//		}
+//		catch (IOException ie) {
+//			System.out.println("IOException raised"); 
+//		}
+//	}
+	
+	public void downloadPage() throws Exception {
+		final Document doc = htmlDocument;
+		if(fileSize()) {
+			final File f = new File("storage/"+ doc.hashCode() + ".html");
+			
+			FileUtils.writeStringToFile(f, doc.outerHtml(), "UTF-8");
+		}
+		System.out.println("File is at or past 5GigaBytes");
+	}
+	
+	public boolean fileSize() {
+		long size = FileUtils.sizeOfDirectory(new File("storage/"));
+		double GB = 1073741824;
+		if(size >= 5*GB) return false; // 5 GB to Bytes = 5368709120
+		return true;
+	}
+	
+	
 	public String nextUrl(int queueNumber)
 	{
 		String nextUrl;
@@ -118,12 +174,14 @@ public class Spider
 		this.visitedUrlHashMap.put(nextUrl, System.currentTimeMillis());
 
 		String hostUrl = getHost(nextUrl);
-		System.out.println(hostUrl);
+		// Testing print statement
+		System.out.println("Host URL: " + hostUrl);
 
         if(this.visitedDomainHashMap.containsKey(hostUrl))
         {
         		long hostElapsedTime = System.currentTimeMillis() - this.visitedDomainHashMap.get(hostUrl);
-        		System.out.println("" + hostElapsedTime);
+        		// Testing print statement	
+        		System.out.println("Last millis since last visit of: " + hostUrl + ": " + hostElapsedTime);
 
             	if( hostElapsedTime < DOMAIN_WAIT_TIME_MILLI)
             	{
@@ -157,6 +215,7 @@ public class Spider
 		}
 	}
 
+	// Placeholder function, needs to be replaced by function that reeds seeds from file
 	public void testSeedInit()
 	{
 		try
@@ -169,6 +228,7 @@ public class Spider
 		}
 	}
 
+	// Testing function - depricated
 	public void printSeedQ()
 	{
 		try
@@ -204,6 +264,7 @@ public class Spider
 		return url;
 	}
 
+	//Will be used to verify .gov urls once we clear testing phase
 	public boolean confirmDotGov(String url)
 	{
 		if(url.indexOf(".gov") != -1)
@@ -216,6 +277,8 @@ public class Spider
 		}
 	}
 
+	// calls helper functions to normalize url and return normalized url if valid
+	// otherwise returns empty string ""
 	public String normalizeUrl(String url)
 	{
 		String temp = removeBookmark(url);
@@ -230,6 +293,7 @@ public class Spider
 		} 
 	}
 
+	// returns host url which is used to track requests to specific server
 	public String getHost(String url)
 	{
 		try
@@ -244,5 +308,4 @@ public class Spider
 		}
 
 	}
-
 }
