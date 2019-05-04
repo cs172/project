@@ -113,9 +113,9 @@ public class Spider
 				nextUrl = normalizeUrl(nextUrl);
 			}
 		}
-		while(this.visitedUrlHashMap.containsKey(nextUrl));
+		while(this.visitedUrlHashMap.containsKey( removeProtocol(nextUrl) ));
 
-		this.visitedUrlHashMap.put(nextUrl, System.currentTimeMillis());
+		this.visitedUrlHashMap.put( removeProtocol(nextUrl), System.currentTimeMillis());
 
 		String hostUrl = getHost(nextUrl);
 		// Testing print statement
@@ -214,6 +214,20 @@ public class Spider
 		if(url.lastIndexOf('#') >= 0)
 		{
 			return "";
+		}
+
+		return url;
+	}
+
+	public String removeProtocol(String url)
+	{
+		if(url.indexOf("https://") >= 0)
+		{
+			return url.substring(9);
+		}
+		else if(url.indexOf("http://") >= 0)
+		{
+			return url.substring(8);
 		}
 
 		return url;
