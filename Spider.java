@@ -44,8 +44,7 @@ public class Spider
 		{
 			queueArrayList.add(new LinkedBlockingQueue<String>());
 		}
-
-		this.seedPopulated = true;
+		
 	}
 
 	public List<LinkedBlockingQueue<String>> getQueueArrayList()
@@ -128,7 +127,7 @@ public class Spider
         		// Testing print statement	
         		System.out.println("Last millis since last visit of: " + hostUrl + ": " + hostElapsedTime);
 
-            	if( hostElapsedTime < DOMAIN_WAIT_TIME_MILLI)
+            	while( (System.currentTimeMillis() - this.visitedDomainHashMap.get(hostUrl)) < DOMAIN_WAIT_TIME_MILLI)
             	{
             		try
             		{
@@ -160,12 +159,23 @@ public class Spider
 		}
 	}
 
+	public boolean isPopulated()
+	{
+		return seedPopulated;
+	}
+
 	// Placeholder function, needs to be replaced by function that reeds seeds from file
 	public void testSeedInit()
 	{
 		try
 		{
 			queueArrayList.get(0).put(seed);
+
+			if(this.maxHopDistance > 0)
+			{
+				this.crawl( this.nextUrl(0) , 1);
+				this.seedPopulated = true;
+			}
 		}
 		catch(Exception e)
 		{
