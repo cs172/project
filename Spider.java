@@ -1,5 +1,6 @@
 package com.ucr.cs172.project.crawler;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URI;
 
@@ -243,4 +244,5 @@ public class Spider
 		}
 
 	}
+
 }
