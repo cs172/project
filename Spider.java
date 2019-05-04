@@ -2,6 +2,7 @@ package com.ucr.cs172.project.crawler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.FileReader;
 import java.net.URI;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -243,6 +244,28 @@ public class Spider
 			return "";
 		}
 
+	}
+
+	public List<String> getUrlSeeds (String seedsFilePath) {
+		List<String> seeds = new ArrayList<String>();
+
+		// Read from the file and store the urls in a List
+		try {
+			// Get the file 
+			FileReader fr = new FileReader(seedsFilePath);
+			BufferedReader in = new BufferedReader(fr);
+			String inputLine;
+			
+			while ((inputLine = in.readLine()) != null)
+				seeds.add(inputLine);
+			
+			// close the reader stream 
+			in.close();
+		} catch (IOException e) {
+			System.out.println("File I/O Error!!!");
+		}
+
+		return seeds;
 	}
 
 }

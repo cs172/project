@@ -15,6 +15,7 @@ public class SpiderTest
 		getArguments(commandArgs," ", 2, args);
         Spider spider = new Spider(commandArgs.seedFilePath, commandArgs.maxHopDistance);
 
+		spider.getUrlSeeds(commandArgs.seedFilePath);
         spider.testSeedInit();
         int listSize = spider.listSize();
         for(int i = 0; i < listSize; i++)
