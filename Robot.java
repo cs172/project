@@ -8,7 +8,7 @@ public class Robot {
 
   /**************************************************************
    * Method purpose: It checks if a url passed as it's parameter
-   *                  is allowed to crawled by the crawler
+   *                 is allowed to be crawled by the crawler
    * 
    * Return value: 
    *    -> true if crawling is allowed
