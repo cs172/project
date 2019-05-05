@@ -7,5 +7,5 @@ This is the master repo we should always have a working project in this branch. 
 1. compile the source files
     1. javac -d . -cp ./jsoup-1.11.3.jar:./commons-io-2-6.jar *.java
 2. run the web-crawler
-    2. java Spider
+    1. java Spider
 
