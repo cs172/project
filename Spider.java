@@ -36,7 +36,7 @@ public class Spider
 
 	private String seed = "https://www.usa.gov";	// Test url, will be replaced by seeds from file
 	private Document htmlDocument;
-
+	private Robot robots;
 
 	private boolean isFinished = false;
 	private int siteNumber;
@@ -61,6 +61,7 @@ public class Spider
 		this.maxSites = maxSites;
 		this.maxHopDistance = maxHopDistance;
 		this.siteNumber = 0;
+		this.robots = new Robot();
 
 		queueArrayList = new ArrayList<LinkedBlockingQueue<String>>();
 
@@ -191,6 +192,7 @@ public class Spider
 
 				nextUrl = normalizeUrl(nextUrl);
 			}
+
 		}
 		while(this.visitedUrlHashMap.containsKey( removeProtocol(nextUrl) ));
 
@@ -217,6 +219,20 @@ public class Spider
             			System.out.println("Interrupted");
             		}
             	}
+        }
+        else
+        {
+        	try
+        	{
+        		List dissallowedList = robots.isCrawlingAllowed( new URL( "https://" + getHost(nextUrl)) );
+
+        		for(int i = 0; i < dissallowedList.size(); i++)
+				{
+					//System.out.println("!!!!!!!!!!!!!! " + dissallowedList.get(i).toString());
+					this.visitedUrlHashMap.put(getHost(nextUrl) + dissallowedList.get(i).toString() , System.currentTimeMillis());
+				}
+        	}
+        	catch(Exception e){}
         }
 
         this.visitedDomainHashMap.put(hostUrl, System.currentTimeMillis());
