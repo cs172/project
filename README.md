@@ -1,7 +1,7 @@
 
 # Spring 2019 CS172 Project
 
-The program is a multithreaded Web Crawler for gov pages written in java. The program uses the seed.txt file to seed the crawler with .gov urls. Then it follows hyperlinks on the seed pages to other sites and downloads the page (html files) if the link corresponses to a .gov site. The  [jsoup](https://jsoup.org/) library is used to parse the html webpages. You can specify the path for the file with the url seeds and the max hop distance from the seed urls via the command prompt.
+The program is a multithreaded Web Crawler for gov pages written in java. The program uses the seed.txt file to seed the crawler with .gov urls. Then it follows hyperlinks on the seed pages to other sites and downloads the page (html file) if the link corresponses to a .gov site. The  [jsoup](https://jsoup.org/) library is used to parse the html webpages. You can specify the path to the file with the url seeds and the max number of sites and the max hop distance from the seed urls via the command prompt.
 
 ## Getting Started
 
@@ -72,6 +72,6 @@ java -cp ".:./jsoup-1.11.3.jar:commons-io-2.6.jar" com.ucr.cs172.project.crawler
 ## Authors
 
 * **Raudel Blazquez Munoz**
-* **Ji Houn**
+* **Ji Houn Huh**
 * **Juan Ceja**
 
