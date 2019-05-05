@@ -37,10 +37,15 @@ public class Spider
 	private String seed = "https://www.usa.gov";	// Test url, will be replaced by seeds from file
 	private Document htmlDocument;
 
+
+	private boolean isFinished = false;
+	private int siteNumber;
+
 	private String seedFilePath;
+	private int maxSites;
 	private int maxHopDistance;
 	//private boolean seedPopulated = false;				// Will be used to prevent threads from initiating work before queuee is seeded
-	private final long DOMAIN_WAIT_TIME_MILLI = 2000;	// How long to wait before requests to same server
+	private final long DOMAIN_WAIT_TIME_MILLI = 1000;	// How long to wait before requests to same server
 
 	//LinkedBlockingQueue is to be used without the blocking capabilities
 	//ArrayList of queues that will track the hop depth from original seed urls
@@ -50,10 +55,12 @@ public class Spider
 	private ConcurrentHashMap<String, Long> visitedUrlHashMap = new ConcurrentHashMap<String, Long>();
 	private ConcurrentHashMap<String, Long> visitedDomainHashMap =  new ConcurrentHashMap<String, Long>();
 
-	public Spider(String seedFilePath, int maxHopDistance)
+	public Spider(String seedFilePath, int maxSites, int maxHopDistance)
 	{
 		this.seedFilePath = seedFilePath;
+		this.maxSites = maxSites;
 		this.maxHopDistance = maxHopDistance;
+		this.siteNumber = 0;
 
 		queueArrayList = new ArrayList<LinkedBlockingQueue<String>>();
 
@@ -108,6 +115,7 @@ public class Spider
             Elements linksOnPage = htmlDocument.select("a[abs:href]");
             System.out.println("Found (" + linksOnPage.size() + ") links adding to queue number: " + queueNumber);
 
+            updateSiteNumber();
             downloadPage();
 
             for(Element link : linksOnPage)
@@ -119,12 +127,17 @@ public class Spider
             }
             return true;
         }
-        catch(Exception e)
+        catch(IOException e)
         {
         	System.out.println("crawl exception");
             // We were not successful in our HTTP request
             return false;
-        } 	
+        }
+        catch(Exception i)
+        {
+        	System.out.println("./storage/ direcotry does not exist: Exiting...");
+        	return false;
+        }	
 	}
 
 	public void downloadPage() throws Exception {
@@ -134,14 +147,32 @@ public class Spider
 			
 			FileUtils.writeStringToFile(f, doc.outerHtml(), "UTF-8");
 		}
-		System.out.println("File is at or past 5GigaBytes");
 	}
 	
 	public boolean fileSize() {
 		long size = FileUtils.sizeOfDirectory(new File("storage/"));
 		double GB = 1073741824;
-		if(size >= 5*GB) return false; // 5 GB to Bytes = 5368709120
+		if(size >= 5*GB)
+		{
+			isFinished = true;
+			System.out.println("File is at or past 5GigaBytes");
+			return false; // 5 GB to Bytes = 5368709120
+		}
 		return true;
+	}
+
+	public boolean isFinished()
+	{
+		return isFinished;
+	}
+
+	public synchronized void updateSiteNumber()
+	{
+		siteNumber++;
+		if(siteNumber >= maxSites)
+		{
+			isFinished = true;
+		}
 	}
 
 	public String nextUrl(int queueNumber)

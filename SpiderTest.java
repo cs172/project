@@ -14,13 +14,14 @@ class MultithreadTest extends Thread
     { 
         try{
             int listSize = spider.listSize();
-            for(int i = 0; i < listSize; i++)
+            for(int i = 0; (i < listSize) && !spider.isFinished(); i++)
             {
-                while( spider.getQueueArrayList().get(i).size() > 0)
+                while( (spider.getQueueArrayList().get(i).size() > 0 )
+                        && !spider.isFinished() )
                 {
                     String temp = spider.nextUrl(i);
 
-                    if(temp.length() > 0)
+                    if( temp.length() > 0 )
                     {
                         if((i+1) < listSize )
                         {
@@ -46,7 +47,8 @@ class MultithreadTest extends Thread
 class ComandArguments
 {
     public String seedFilePath;
-    public int maxHopDistance;
+    public int maxHopDistance = 10;
+    public int maxSites;
 }
 
 public class SpiderTest
@@ -55,8 +57,8 @@ public class SpiderTest
     {
         
         ComandArguments commandArgs = new ComandArguments();
-        getArguments(commandArgs," ", 2, args);
-        Spider spider = new Spider(commandArgs.seedFilePath, commandArgs.maxHopDistance);
+        getArguments(commandArgs, args);
+        Spider spider = new Spider(commandArgs.seedFilePath, commandArgs.maxSites, commandArgs.maxHopDistance);
 
         MultithreadTest one = new MultithreadTest(spider);
         MultithreadTest two = new MultithreadTest(spider);
@@ -104,31 +106,40 @@ public class SpiderTest
         */
     }
 
-    public static void getArguments (ComandArguments arguments, String defaultFilePath,
-                                              int defaultMaxHops, String[] args) 
+    public static void getArguments (ComandArguments arguments, String[] args) 
     {
 
-        if (args.length == 0 || args.length == 1) {
+        if (args.length == 0) {
             System.out.println("*****************************************************");
-            System.out.println("* No or too few arguments for seedFilePath and      *");
-            System.out.println("* maxHopsDistance provided using default arguments. *");
+            System.out.println("* No or too few arguments for seedFilePath          *");
             System.out.println("*****************************************************");;
 
-            arguments.seedFilePath = defaultFilePath;
-            arguments.maxHopDistance = defaultMaxHops;
+            System.exit(-1);
         } else {
+
             arguments.seedFilePath = args[0];
 
-            // convert string to int
-
-            int maxHops = defaultMaxHops;
-            try {
-                maxHops = Integer.parseInt(args[1]);
-            } catch (NumberFormatException e) {
-                System.out.println("Conversion from string to integer error.");
+            if(args.length >= 2)
+            {
+                // convert string to int
+                try {
+                    arguments.maxSites = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    System.out.println("Conversion from string to integer error.");
+                    System.exit(-1);
+                }
             }
 
-            arguments.maxHopDistance = maxHops;
+            if(args.length == 3)
+            {
+                // convert string to int
+                try {
+                    arguments.maxHopDistance = Integer.parseInt(args[2]);
+                } catch (NumberFormatException e) {
+                    System.out.println("Conversion from string to integer error.");
+                    System.exit(-1);
+                }
+            }
         }
     } // End getArguments()
 }
