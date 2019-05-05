@@ -339,7 +339,7 @@ public class Spider
 	//Will be used to verify .gov urls once we clear testing phase
 	public boolean confirmDotGov(String url)
 	{
-		if(url.indexOf(".gov") != -1)
+		if( (url.indexOf(".gov") != -1) && (url.indexOf(".com") == -1) && (url.indexOf(".org") == -1) )
 		{
 			return true;
 		}
