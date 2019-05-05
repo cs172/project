@@ -1,8 +1,16 @@
 package com.ucr.cs172.project.crawler;
 
-import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.File;
 import java.io.FileReader;
+
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.net.URI;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -10,11 +18,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Attribute;
 import org.jsoup.select.Elements;
+
+import org.apache.commons.io.FileUtils;
+
+
+import java.net.URL; 
+import java.net.MalformedURLException; 
 
 public class Spider
 {
@@ -24,7 +39,7 @@ public class Spider
 
 	private String seedFilePath;
 	private int maxHopDistance;
-	private boolean seedPopulated = false;				// Will be used to prevent threads from initiating work before queuee is seeded
+	//private boolean seedPopulated = false;				// Will be used to prevent threads from initiating work before queuee is seeded
 	private final long DOMAIN_WAIT_TIME_MILLI = 2000;	// How long to wait before requests to same server
 
 	//LinkedBlockingQueue is to be used without the blocking capabilities
@@ -47,7 +62,16 @@ public class Spider
 			queueArrayList.add(new LinkedBlockingQueue<String>());
 		}
 
-		List<String> seeds = getUrlSeeds(seedFilePath);
+		ArrayList<String> seeds = getUrlSeeds(seedFilePath);
+
+		for(int i = 0; i < seeds.size(); i++)
+		{
+			try
+			{
+				queueArrayList.get(0).put(seeds.get(i));
+			}
+			catch(Exception e){}
+		}
 	}
 
 	public List<LinkedBlockingQueue<String>> getQueueArrayList()
@@ -58,7 +82,8 @@ public class Spider
 	public ConcurrentHashMap<String, Long> getConcurrentHashMap()
 	{
 		return this.visitedUrlHashMap;
-	}
+	}//		}
+
 
 	// Return value currently not used
 	// Most of the work is handled here, requires object that handles Document storage
@@ -82,6 +107,9 @@ public class Spider
             }
             Elements linksOnPage = htmlDocument.select("a[abs:href]");
             System.out.println("Found (" + linksOnPage.size() + ") links adding to queue number: " + queueNumber);
+
+            downloadPage();
+
             for(Element link : linksOnPage)
             {
             	if(queueNumber >= 0)
@@ -97,6 +125,23 @@ public class Spider
             // We were not successful in our HTTP request
             return false;
         } 	
+	}
+
+	public void downloadPage() throws Exception {
+		final Document doc = htmlDocument;
+		if(fileSize()) {
+			final File f = new File("storage/"+ doc.hashCode() + ".html");
+			
+			FileUtils.writeStringToFile(f, doc.outerHtml(), "UTF-8");
+		}
+		System.out.println("File is at or past 5GigaBytes");
+	}
+	
+	public boolean fileSize() {
+		long size = FileUtils.sizeOfDirectory(new File("storage/"));
+		double GB = 1073741824;
+		if(size >= 5*GB) return false; // 5 GB to Bytes = 5368709120
+		return true;
 	}
 
 	public String nextUrl(int queueNumber)
@@ -148,8 +193,8 @@ public class Spider
 		return nextUrl;
 	}
 
-	public List<String> getUrlSeeds (String seedsFilePath) {
-		List<String> seeds = new ArrayList<String>();
+	public ArrayList<String> getUrlSeeds (String seedsFilePath) {
+		ArrayList<String> seeds = new ArrayList<String>();
 
 		// Read from the file and store the urls in a List
 		try {
@@ -184,6 +229,7 @@ public class Spider
 		}
 	}
 
+	/*
 	public boolean isPopulated()
 	{
 		return seedPopulated;
@@ -207,6 +253,7 @@ public class Spider
 			System.out.println("testSeedInit Error");
 		}
 	}
+	*/
 
 	// Testing function - depricated
 	public void printSeedQ()

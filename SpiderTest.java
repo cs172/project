@@ -58,11 +58,6 @@ public class SpiderTest
         getArguments(commandArgs," ", 2, args);
         Spider spider = new Spider(commandArgs.seedFilePath, commandArgs.maxHopDistance);
 
-        // This function should be replaced by a function that reads seeds in from file
-        spider.testSeedInit();
-
-        while(! spider.isPopulated() ){};
-
         MultithreadTest one = new MultithreadTest(spider);
         MultithreadTest two = new MultithreadTest(spider);
         MultithreadTest three = new MultithreadTest(spider);
