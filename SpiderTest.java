@@ -1,5 +1,7 @@
 package com.ucr.cs172.project.crawler;
+import java.awt.Robot;
 import java.lang.Thread;
+import java.util.ArrayList;
 
 // Object to hold command line arguments
 class ComandArguments {
@@ -11,9 +13,13 @@ public class SpiderTest
 {	
 	public static void main(String[] args)
     {
+		final String DEFAULTSEEDPATH = "seed.txt";
+		final int DEFAULTMAXHOPS = 2;
+
 		ComandArguments commandArgs = new ComandArguments();
-		getArguments(commandArgs," ", 2, args);
-        Spider spider = new Spider(commandArgs.seedFilePath, commandArgs.maxHopDistance);
+		getArguments(commandArgs, DEFAULTSEEDPATH, DEFAULTMAXHOPS, args);
+		Spider spider = new Spider(commandArgs.seedFilePath, commandArgs.maxHopDistance);
+		
 
 		spider.getUrlSeeds(commandArgs.seedFilePath);
         spider.testSeedInit();
@@ -46,8 +52,8 @@ public class SpiderTest
 	} // End main()
 	
 
-	public static void getArguments (ComandArguments arguments, String defaultFilePath,
-											  int defaultMaxHops, String[] args) 
+	public static void getArguments (ComandArguments arguments, String defaultFilePath, 
+													 int defaultMaxHops, String[] args) 
 	{
 
 		if (args.length == 0 || args.length == 1) {

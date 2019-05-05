@@ -11,13 +11,14 @@ public class Robot {
    *                 is allowed to be crawled by the crawler
    * 
    * Return value: 
-   *    -> true if crawling is allowed
-   *    -> false if exception or crawling not allowed 
+   *    -> list with disallowed values
    **************************************************************/
-  public boolean isCrawlingAllowed(URL url) {
+  public List<String> isCrawlingAllowed(URL url) {
     String strHost, strProtocol, strFile = " ";
     final String robotsFile = "/robots.txt";
     final String DISALLOW = "Disallow:";
+
+    List<String> disList = new ArrayList<String>();
 
     try {
         // Create the url for the host robots.txt file
@@ -26,7 +27,6 @@ public class Robot {
 
         URL nUrl =  new URL(strProtocol, strHost, robotsFile);
         
-
         // Get the file 
         BufferedReader in = new BufferedReader(new InputStreamReader(nUrl.openStream()));
         String inputLine;
@@ -36,36 +36,33 @@ public class Robot {
 
         // close the reader stream 
         in.close();
+
+        // Search for "Disallow:" fields
+        int index = 0;
+
+	    while ((index = strFile.indexOf(DISALLOW, index)) != -1) {
+	        index += DISALLOW.length();
+        
+            String strPath = strFile.substring(index);
+	        StringTokenizer st = new StringTokenizer(strPath);
+
+	        if (!st.hasMoreTokens())
+		        break;
+            
+            // Get bad path and add to the disallowed list
+            String strBadPath = st.nextToken();
+            disList.add(strBadPath);
+        }
     } catch (MalformedURLException e) {
         // Error with URL formation don't crawl
-        return false;
+        System.out.println("Int Robot.java MalformUrl exception");
     } catch (IOException e) {
         // No robots.txt file so it's okay to crawl
-        return true;
-    }
-
-
-	// Search for "Disallow:" fields
-	String strURL = url.getFile();
-    int index = 0;
-
-	while ((index = strFile.indexOf(DISALLOW, index)) != -1) {
-	    index += DISALLOW.length();
-	    String strPath = strFile.substring(index);
-	    StringTokenizer st = new StringTokenizer(strPath);
-
-	    if (!st.hasMoreTokens())
-		    break;
-	    
-	    String strBadPath = st.nextToken();
-
-	    // If path starts with Disallowed: then skip 
-	    if (strURL.indexOf(strBadPath) == 0)
-		    return false;
+        System.out.println("Int Robot.java I/O exception");
     }
     
-    // If we made it this far then the we are allowed to crawl the url
-    return true;
+    // Return list of disallowed fields
+    return disList;
   }
 
 }
